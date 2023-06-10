@@ -1,0 +1,222 @@
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Attendance List</title>
+    <script src="https://kit.fontawesome.com/912e452282.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+        /*font-family: 'Montserrat', sans-serif;
+        font-family: 'Open Sans', sans-serif;*/
+        *{
+            margin:0
+            
+        }
+        body{
+            font-family:'Montserrat',sans-serif;
+            overflow-x: hidden;
+        }
+        .main-container{
+            width: 60%;
+            transform: translateX(30%);
+
+            border: none ;
+            overflow-x: hidden;
+            margin-top: 4%;
+        }
+        .option-bar{
+            width: 100%;
+            border: none;
+            padding: 10px 20px;
+            background-color: #0e466b;
+            color: #fff;
+        }
+        .attendance-section>table{
+            border: 1px solid #ccc;
+            width: 100%;
+            text-align: center;
+            border-collapse: collapse;
+            
+        }
+        .attendance-section th{
+        
+            color: #0e466b;
+            border-bottom: 1px solid #0e466b;
+            padding: 5px;
+            font-weight: 600;
+        }
+        .attendance-section td{
+           padding: 5px;
+           color: #333;
+           font-weight: 500;
+           font-size: 14px;
+        }
+        .btn{
+            width: 50%;
+            background-color: #0e466b;
+            font-family:'Montserrat',sans-serif;
+            font-size: 20px;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+            padding: 10px 20px;
+            color: #fff;
+        }
+        .btn:hover{
+            background-color: #1a5983;   
+        }
+
+        form{
+            width: 100%;
+            padding: 10px 20px;
+           
+            
+        }
+        form>h1{
+            font-weight: 500;
+            color: #333;
+        }
+        .field{
+            width: 100%;
+        }
+        .field>label{
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        .field>input{
+            outline: none;
+            font-size: 16px;
+            font-family:'Montserrat',sans-serif;
+            background-color: #ccc;
+            border: none;
+            width: 50%;
+            color: #333;
+            padding: 10px 20px;
+            margin-top: 15px;
+        }
+        .fa-trash-can{
+            color: rgb(196, 33, 33);
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="option-bar">
+            <p> <i class="fa fa-clipboard-user"></i> Attendance</p>
+            
+        </div>
+        <div class="attendance-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Ticket Number</th>
+                        <th style="color: rgb(196, 33, 33);">Remove</th>
+                    </tr>
+                </thead>
+                
+                <tbody id="attendeesTbl">
+
+                </tbody>
+            </table>
+
+            <br>
+            <br>
+            <form id="addAttendee">
+                <h1>Add Attendee</h1>
+                <br>
+                <div class="field">
+                    <label for="name">Name</label>
+                    <br>
+                    <input type="text" name="name" id="name" placeholder="Carl Duncan">
+                </div>
+
+                <div class="field">
+                    <label for="email">Email</label>
+                    <br>
+                    <input type="email" name="email" id="email" placeholder="carlduncan@mail.com">
+                </div>
+
+                <button type="submit" class="btn">Add <i class="fa fa-person-circle-plus"></i></button>
+
+            </form>
+        </div>
+        
+    </div>
+
+    
+    <script>
+        function fetch_attendees(){
+            fetch('db.php')
+            .then(res=>res.json())
+            .then(attendees=>{
+                const attendee=document.getElementById('attendeesTbl');
+                attendee.innerHTML='';
+
+                attendees.forEach(row=>{
+                    const tuple=document.createElement('tr')
+                    tuple.innerHTML=`<td>${row.PersonID}</td> <td>${row.PersonName}</td> <td>${row.Email}</td> <td>${row.TicketNo}</td> <td><i class="fa fa-trash-can" onclick="deleteAttendee('${row.PersonID}')"></i></td>`
+                    attendee.appendChild(tuple)
+                });
+            })
+            .catch(err=>console.log('Error: '+err));
+        }
+
+        //call function fetch_attendees
+        fetch_attendees()
+
+        //function to insertData
+        function add_attendee(name,email){
+            fetch('db.php',{
+                method:'POST',
+                headers:{'Content-Type':'application/x-www-form-urlencoded'},
+                body:`name=${name}&email=${email}`
+
+            })
+            .then(res=>{
+                if(res.ok) fetch_attendees();
+                else console.log(res.statusText)
+            })
+            .catch(err=>console.log(err))
+        }
+
+        //listen for form submission
+        const myform=document.getElementById('addAttendee')
+        myform.addEventListener('submit',e=>{
+            //e.preventDefault();
+            const uname=document.getElementById('name').value.trim()
+            const uemail=document.getElementById('email').value.trim()
+
+            if(uname !==''&&uemail !==''){
+                add_attendee(uname,uemail);
+                
+            }
+
+        })
+
+        //removing an attendee
+        function deleteAttendee(uid){
+            
+
+            fetch(`db.php?attendeeId=${uid}`,{method:'DELETE'})
+            .then(res=>{
+                if(res.ok)fetch_attendees()
+            })
+            .catch(err=>console.log(err))
+        }
+
+    </script>
+    
+</body>
+</html>
